@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import countryNames from "../names.json";
+import React, { useState, useEffect } from "react";
 import validator from "email-validator";
 import isValidDomain from "is-valid-domain";
 import firebase from "../config/fbConfig";
@@ -22,6 +21,18 @@ const Requset = () => {
   const [successShow, setSuccessShow] = useState(false);
   const [sameDomain, setSameDomain] = useState("");
   const [loading, setLoading] = useState(false);
+  const [countries, setCountries] = useState({});
+
+  useEffect(() => {
+    fetch("https://cors-anywhere.herokuapp.com/https://webhose.io/names.json")
+      .then(response => response.json())
+      .then(data => {
+        setCountries(data);
+      })
+      .catch(err => {
+        console.log("error", err);
+      });
+  }, []);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -132,7 +143,7 @@ const Requset = () => {
   };
 
   const printCountries = () => {
-    const values = Object.values(countryNames);
+    const values = Object.values(countries);
     const list = values.map((country, i) => {
       return (
         <option value={country} key={i}>
@@ -143,6 +154,19 @@ const Requset = () => {
 
     return list;
   };
+
+  if (
+    Object.entries(countries).length === 0 &&
+    countries.constructor === Object
+  ) {
+    return (
+      <div className="App d-flex justify-content-center align-items-center">
+        <div className="spinner-border text-info" role="status">
+          <span className="sr-only">Loading...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="App d-flex flex-column justify-content-center align-items-center">
